@@ -3,8 +3,12 @@
 import sys
 import requests
 from requests import session
+import csv
 from bs4 import BeautifulSoup
+import re
 #スクレイピング(抽出)に特化した機能を持っている
+
+ignore_list = ["特訓前と共通",""]
 
 def Collect_text():
     print("")
@@ -14,8 +18,23 @@ def Collect_text():
     soup = BeautifulSoup(html.text, 'html.parser')
     #print(soup)
 
-    print(type(soup))
-    print(soup.prettify())
+    #print(type(soup))
+    #print(soup.prettify())
+
+    #テーブルを指定
+    table = soup.findAll("td",{"data-col":"1"},{"style":"text-align:left;"})
+    csvFile = open("Yurufuwa_text.csv","wt", newline = "", encoding = "utf-8")
+    write = csv.writer(csvFile)
+
+    try:
+        for i in table:
+            if i.get_text() not in ignore_list:
+                yurufuwa_text = re.sub("○○", "プロデューサー", (i.get_text()))
+                print(yurufuwa_text)
+                write.writerow(yurufuwa_text)
+    finally:
+        csvFile.close()
+
 
     print("finish!!!")
 
